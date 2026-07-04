@@ -21,10 +21,14 @@ def get_db():
         db.close()
 
 
+def get_db_session():
+    return SessionLocal()
+
+
 def check_database_connection() -> bool:
     try:
         with engine.connect() as connection:
             connection.execute(text("SELECT 1"))
         return True
-    except SQLAlchemyError:
+    except (SQLAlchemyError, RuntimeError):
         return False

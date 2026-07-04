@@ -1,7 +1,11 @@
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+BACKEND_DIR = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = BACKEND_DIR.parent
 
 
 class Settings(BaseSettings):
@@ -9,7 +13,10 @@ class Settings(BaseSettings):
     app_env: str = Field(default="development", alias="APP_ENV")
     app_host: str = Field(default="0.0.0.0", alias="APP_HOST")
     app_port: int = Field(default=8000, alias="APP_PORT")
-    app_cors_origins: str = Field(default="http://localhost:3000", alias="APP_CORS_ORIGINS")
+    app_cors_origins: str = Field(
+        default="http://localhost:3000,http://127.0.0.1:3000",
+        alias="APP_CORS_ORIGINS",
+    )
     database_url: str = Field(
         default="mysql+pymysql://root:password@localhost:3306/myaitodo",
         alias="DATABASE_URL",
@@ -20,9 +27,10 @@ class Settings(BaseSettings):
         default=1440,
         alias="ACCESS_TOKEN_EXPIRE_MINUTES",
     )
+    default_user_timezone: str = Field(default="Asia/Shanghai", alias="DEFAULT_USER_TIMEZONE")
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=(PROJECT_ROOT / ".env", BACKEND_DIR / ".env"),
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",
