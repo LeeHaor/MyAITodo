@@ -6,6 +6,7 @@
 
 - [03-architecture-v1.md](./03-architecture-v1.md)：V1 体系架构设计文档
 - [04-tech-stack.md](./04-tech-stack.md)：技术栈定稿说明
+- [05-api-design.md](./05-api-design.md)：V1 RESTful API 设计文档
 
 ## 后续建议补充
 
