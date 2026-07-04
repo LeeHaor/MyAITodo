@@ -2,6 +2,8 @@
 
 MyAITodo is a personal AI-enhanced Todo full-stack project focused on practicing the complete workflow of AI product design, web development, API integration, and deployment.
 
+依托于 Codex 桌面版协作开发流程的 AI 全栈练习项目，定位为一个集成 AI 能力的任务管理器。
+
 ![MyAITodo Cover](./docs/assets/myaitodo-cover.svg)
 
 ## V1 Positioning
