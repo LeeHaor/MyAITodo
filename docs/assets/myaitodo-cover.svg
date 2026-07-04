@@ -1,0 +1,45 @@
+<svg width="1280" height="720" viewBox="0 0 1280 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="coverBg" x1="0" y1="0" x2="1280" y2="720" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FAF3E8"/>
+      <stop offset="0.5" stop-color="#F4E6CF"/>
+      <stop offset="1" stop-color="#D8E8E0"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#FFFDF8"/>
+      <stop offset="1" stop-color="#F4EFE5"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#5A5A5A" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+
+  <rect width="1280" height="720" fill="url(#coverBg)"/>
+  <circle cx="1060" cy="120" r="140" fill="#E8D0A6" fill-opacity="0.7"/>
+  <circle cx="180" cy="620" r="180" fill="#BFDAD0" fill-opacity="0.58"/>
+
+  <rect x="96" y="90" width="1088" height="540" rx="36" fill="#FFFFFF" fill-opacity="0.52" filter="url(#shadow)"/>
+
+  <text x="154" y="218" fill="#1F313B" font-family="Segoe UI, Arial, sans-serif" font-size="62" font-weight="700">MyAITodo</text>
+  <text x="156" y="278" fill="#4B5E69" font-family="Segoe UI, Arial, sans-serif" font-size="28">AI-powered Todo app for personal full-stack practice</text>
+
+  <rect x="156" y="334" width="360" height="208" rx="28" fill="url(#panel)" filter="url(#shadow)"/>
+  <text x="190" y="390" fill="#1F313B" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="700">User Value</text>
+  <text x="190" y="432" fill="#4B5E69" font-family="Segoe UI, Arial, sans-serif" font-size="21">Turn vague tasks into</text>
+  <text x="190" y="464" fill="#4B5E69" font-family="Segoe UI, Arial, sans-serif" font-size="21">clear next actions</text>
+  <text x="190" y="508" fill="#4B5E69" font-family="Segoe UI, Arial, sans-serif" font-size="21">with AI rewrite, decomposition,</text>
+  <text x="190" y="540" fill="#4B5E69" font-family="Segoe UI, Arial, sans-serif" font-size="21">and priority suggestions</text>
+
+  <rect x="560" y="314" width="468" height="240" rx="30" fill="#F7FBF9" filter="url(#shadow)"/>
+  <text x="598" y="370" fill="#1F313B" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="700">V1 Core Capabilities</text>
+  <rect x="598" y="398" width="168" height="46" rx="14" fill="#F0E1C7"/>
+  <rect x="784" y="398" width="198" height="46" rx="14" fill="#DCEBE4"/>
+  <rect x="598" y="462" width="168" height="46" rx="14" fill="#DCE3F0"/>
+  <rect x="784" y="462" width="198" height="46" rx="14" fill="#F3E9DC"/>
+  <text x="628" y="428" fill="#1F313B" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="600">Todo CRUD</text>
+  <text x="816" y="428" fill="#1F313B" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="600">AI Rewrite</text>
+  <text x="622" y="492" fill="#1F313B" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="600">AI Priority</text>
+  <text x="816" y="492" fill="#1F313B" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="600">AI Decompose</text>
+
+  <text x="156" y="602" fill="#51626D" font-family="Segoe UI, Arial, sans-serif" font-size="20">Stack: Next.js · FastAPI · MySQL · JWT · OpenAI-compatible API</text>
+</svg>
