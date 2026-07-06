@@ -77,7 +77,7 @@ async def decompose_task(title: str) -> list[str]:
     content = await _chat_completion(
         system_prompt=(
             "你是任务规划助手。请把用户输入的一条任务拆成 3 到 5 条可执行子任务。"
-            "只返回 JSON，格式为 {\"items\": [\"子任务1\", \"子任务2\"]}。"
+            '只返回 JSON，格式为 {"items": ["子任务1", "子任务2"]}。'
         ),
         user_prompt=f"请拆解这条任务：{title}",
     )
@@ -95,8 +95,8 @@ async def decompose_task(title: str) -> list[str]:
 async def rewrite_task(title: str) -> dict[str, str]:
     content = await _chat_completion(
         system_prompt=(
-            "你是任务重写助手。请把任务标题改写得更明确、可执行。"
-            "只返回 JSON，格式为 {\"title\": \"...\", \"reason\": \"...\"}。"
+            "你是任务重写助手。请把任务标题改写得更明确、更可执行。"
+            '只返回 JSON，格式为 {"title": "...", "reason": "..."}。'
         ),
         user_prompt=f"请重写这条任务：{title}",
     )
@@ -119,7 +119,7 @@ async def suggest_priority(title: str) -> dict[str, str]:
     content = await _chat_completion(
         system_prompt=(
             "你是任务优先级助手。请基于任务紧急度和执行价值给出优先级建议。"
-            "只返回 JSON，格式为 {\"priority\": \"高|中|低\", \"reason\": \"...\"}。"
+            '只返回 JSON，格式为 {"priority": "高/中/低", "reason": "..."}。'
         ),
         user_prompt=f"请判断这条任务的优先级：{title}",
     )

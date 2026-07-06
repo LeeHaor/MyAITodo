@@ -29,6 +29,7 @@ import {
   getEditableTitle,
   getGreeting,
   getHistoryActionLabel,
+  hydrateHistory,
   hydrateTodos,
 } from "../lib/todo-utils";
 
@@ -151,6 +152,7 @@ export default function HomePage() {
   }, [loadAuthedData]);
 
   const normalizedTodos = useMemo(() => hydrateTodos(todos), [todos]);
+  const normalizedHistory = useMemo(() => hydrateHistory(historyItems), [historyItems]);
 
   const filteredTodos = useMemo(() => {
     if (activeFilter === "active") {
@@ -393,7 +395,7 @@ export default function HomePage() {
 
     const trimmedTitle = title.trim();
     if (!trimmedTitle) {
-      setAIState((current) => ({ ...current, error: "请先输入任务标题。"}));
+      setAIState((current) => ({ ...current, error: "请先输入任务标题。" }));
       return;
     }
 
@@ -426,7 +428,7 @@ export default function HomePage() {
 
     const trimmedTitle = title.trim();
     if (!trimmedTitle) {
-      setAIState((current) => ({ ...current, error: "请先输入任务标题。"}));
+      setAIState((current) => ({ ...current, error: "请先输入任务标题。" }));
       return;
     }
 
@@ -460,7 +462,7 @@ export default function HomePage() {
 
     const trimmedTitle = title.trim();
     if (!trimmedTitle) {
-      setAIState((current) => ({ ...current, error: "请先输入任务标题。"}));
+      setAIState((current) => ({ ...current, error: "请先输入任务标题。" }));
       return;
     }
 
@@ -693,7 +695,8 @@ export default function HomePage() {
             <p className="greeting">{getGreeting()}</p>
             <h1>我的一天</h1>
             <p className="date-caption">
-              先把今天要做的事情收进来，再一件件完成。当前版本已经支持登录鉴权、任务 CRUD、个人资料、历史记录，以及 AI 拆解、重写和优先级建议。
+              先把今天要做的事情收进来，再一件件完成。当前版本已经支持登录鉴权、任务 CRUD、
+              个人资料、历史记录，以及 AI 拆解、重写和优先级建议。
             </p>
           </div>
 
@@ -807,7 +810,9 @@ export default function HomePage() {
             <section className="ai-result-card">
               <p className="sidebar-card-title">AI 拆解结果</p>
               {aiState.decompositionItems.length === 0 ? (
-                <p className="ai-result-empty">输入任务后，可让 AI 给出 3 到 5 条可执行子任务。</p>
+                <p className="ai-result-empty">
+                  输入任务后，可让 AI 给出 3 到 5 条可执行子任务。
+                </p>
               ) : (
                 <ol className="ai-result-list">
                   {aiState.decompositionItems.map((item) => (
@@ -853,7 +858,7 @@ export default function HomePage() {
         <section className="todo-section">
           <div className="todo-section-head">
             <h2>{getSectionTitle()}</h2>
-            <span className="task-total">{isLoading ? "加载中" : `${filteredTodos.length} 条`}</span>
+            <span className="task-total">{isLoading ? "加载中..." : `${filteredTodos.length} 条`}</span>
           </div>
 
           {isLoading ? (
@@ -896,14 +901,14 @@ export default function HomePage() {
             </div>
           </div>
 
-          {historyItems.length === 0 ? (
+          {normalizedHistory.length === 0 ? (
             <div className="state-panel">
               <strong>还没有历史记录</strong>
               <p>当你创建、编辑、完成或删除任务时，这里会自动留下记录。</p>
             </div>
           ) : (
             <ul className="history-list">
-              {historyItems.map((item) => (
+              {normalizedHistory.map((item) => (
                 <li key={item.id} className="history-row">
                   <div className="history-row-head">
                     <strong>{getHistoryActionLabel(item.action)}</strong>

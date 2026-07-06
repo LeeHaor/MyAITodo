@@ -2,33 +2,14 @@ import type { HistoryItem, TodoItem } from "./todo-api";
 
 export const CORRUPTED_TITLE_FALLBACK = "历史任务内容异常";
 
-export function normalizeTitle(value: string) {
-  if (!value) {
-    return "";
-  }
-
-  try {
-    const bytes = Uint8Array.from([...value].map((char) => char.charCodeAt(0)));
-    const decoded = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
-
-    if (/\p{Script=Han}/u.test(decoded)) {
-      return decoded;
-    }
-  } catch {
-    return value;
-  }
-
-  return value;
-}
-
-export function isCorruptedTitle(value: string) {
+function looksLikeBrokenText(value: string) {
   const trimmed = value.trim();
 
   if (!trimmed) {
     return true;
   }
 
-  if (trimmed.includes("�")) {
+  if (trimmed.includes("锟")) {
     return true;
   }
 
@@ -36,27 +17,32 @@ export function isCorruptedTitle(value: string) {
     return true;
   }
 
-  if ((trimmed.match(/\?/g) ?? []).length >= 3) {
+  if (trimmed.includes("�")) {
     return true;
   }
 
-  return false;
+  return /[Ã¤Ã¥Ã¦Ã§Ã©Ã¨Ã¬Ã±Ã¶Ã¼]/.test(trimmed);
 }
 
 export function getDisplayTitle(value: string) {
-  const normalized = normalizeTitle(value);
-  return isCorruptedTitle(normalized) ? CORRUPTED_TITLE_FALLBACK : normalized;
+  return looksLikeBrokenText(value) ? CORRUPTED_TITLE_FALLBACK : value.trim();
 }
 
 export function getEditableTitle(value: string) {
-  const normalized = normalizeTitle(value);
-  return isCorruptedTitle(normalized) ? "" : normalized;
+  return looksLikeBrokenText(value) ? "" : value.trim();
 }
 
 export function hydrateTodos(todos: TodoItem[]) {
   return todos.map((todo) => ({
     ...todo,
     title: getDisplayTitle(todo.title),
+  }));
+}
+
+export function hydrateHistory(items: HistoryItem[]) {
+  return items.map((item) => ({
+    ...item,
+    title_snapshot: getDisplayTitle(item.title_snapshot),
   }));
 }
 
