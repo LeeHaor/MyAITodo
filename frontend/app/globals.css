@@ -516,6 +516,33 @@ button {
   padding: 10px 6px 2px;
 }
 
+.ai-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 4px 2px 0;
+}
+
+.ai-tool-button {
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(31, 41, 55, 0.08);
+  background: #fff;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.ai-tool-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(37, 99, 201, 0.12);
+}
+
+.ai-tool-button:disabled {
+  opacity: 0.62;
+  cursor: default;
+}
+
 .feedback {
   margin: 0;
   font-size: 13px;
@@ -527,6 +554,94 @@ button {
 
 .feedback.error {
   color: var(--danger);
+}
+
+.ai-result-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.ai-result-card {
+  min-height: 180px;
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid rgba(31, 41, 55, 0.06);
+}
+
+.ai-result-empty,
+.ai-reason-text {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.ai-result-list {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: var(--ink);
+}
+
+.ai-result-list li + li {
+  margin-top: 8px;
+}
+
+.ai-insight-block {
+  display: grid;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.ai-priority-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ai-priority-row span {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.priority-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 52px;
+  min-height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.priority-高 {
+  background: rgba(188, 76, 76, 0.12);
+  color: var(--danger);
+}
+
+.priority-中 {
+  background: rgba(37, 99, 201, 0.1);
+  color: var(--accent);
+}
+
+.priority-低 {
+  background: rgba(46, 137, 97, 0.1);
+  color: var(--success);
+}
+
+.priority-empty {
+  background: #edf2f9;
+  color: var(--muted);
+}
+
+.ai-divider {
+  height: 1px;
+  background: rgba(31, 41, 55, 0.08);
 }
 
 .focus-panel {
@@ -847,6 +962,10 @@ button {
 
   .focus-copy {
     text-align: left;
+  }
+
+  .ai-result-grid {
+    grid-template-columns: 1fr;
   }
 }
 

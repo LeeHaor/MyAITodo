@@ -28,8 +28,7 @@ def list_todos(
         .where(Todo.user_id == current_user.id)
         .order_by(Todo.created_at.desc(), Todo.id.desc())
     ).all()
-    items = [TodoListItem.model_validate(todo) for todo in todos]
-    return TodoListResponse(items=items)
+    return TodoListResponse(items=[TodoListItem.model_validate(todo) for todo in todos])
 
 
 @router.post("", response_model=TodoListItem, status_code=status.HTTP_201_CREATED)
@@ -63,14 +62,10 @@ def update_todo_status(
 ) -> TodoListItem:
     todo = db.scalar(select(Todo).where(Todo.id == todo_id, Todo.user_id == current_user.id))
     if todo is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="任务不存在。",
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="任务不存在。")
 
     todo.is_completed = payload.is_completed
-    action = "completed" if payload.is_completed else "reopened"
-    db.add(create_history_record(current_user, todo, action))
+    db.add(create_history_record(current_user, todo, "completed" if payload.is_completed else "reopened"))
     db.commit()
     db.refresh(todo)
     return TodoListItem.model_validate(todo)
@@ -85,10 +80,7 @@ def update_todo(
 ) -> TodoListItem:
     todo = db.scalar(select(Todo).where(Todo.id == todo_id, Todo.user_id == current_user.id))
     if todo is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="任务不存在。",
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="任务不存在。")
 
     title = payload.title.strip()
     if not title:
@@ -112,10 +104,7 @@ def delete_todo(
 ) -> None:
     todo = db.scalar(select(Todo).where(Todo.id == todo_id, Todo.user_id == current_user.id))
     if todo is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="任务不存在。",
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="任务不存在。")
 
     db.add(create_history_record(current_user, todo, "deleted"))
     db.delete(todo)

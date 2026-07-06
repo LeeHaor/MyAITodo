@@ -28,6 +28,20 @@ export type HistoryItem = {
   created_at: string;
 };
 
+export type AIDecomposeResult = {
+  items: string[];
+};
+
+export type AIRewriteResult = {
+  title: string;
+  reason: string;
+};
+
+export type AIPriorityResult = {
+  priority: "高" | "中" | "低";
+  reason: string;
+};
+
 type TodoListResponse = {
   items: TodoItem[];
 };
@@ -184,5 +198,32 @@ export async function fetchHistory(token: string) {
     method: "GET",
     token,
     fallbackMessage: "历史记录加载失败，请刷新重试。",
+  });
+}
+
+export async function aiDecomposeTodo(token: string, title: string) {
+  return requestJson<AIDecomposeResult>("/ai/decompose", {
+    method: "POST",
+    token,
+    body: JSON.stringify({ title }),
+    fallbackMessage: "AI 拆解失败，请稍后重试。",
+  });
+}
+
+export async function aiRewriteTodo(token: string, title: string) {
+  return requestJson<AIRewriteResult>("/ai/rewrite", {
+    method: "POST",
+    token,
+    body: JSON.stringify({ title }),
+    fallbackMessage: "AI 重写失败，请稍后重试。",
+  });
+}
+
+export async function aiSuggestPriority(token: string, title: string) {
+  return requestJson<AIPriorityResult>("/ai/priority", {
+    method: "POST",
+    token,
+    body: JSON.stringify({ title }),
+    fallbackMessage: "AI 优先级建议失败，请稍后重试。",
   });
 }

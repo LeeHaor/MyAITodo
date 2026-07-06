@@ -28,7 +28,7 @@ export function isCorruptedTitle(value: string) {
     return true;
   }
 
-  if (trimmed.includes("锟")) {
+  if (trimmed.includes("�")) {
     return true;
   }
 

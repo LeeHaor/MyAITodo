@@ -4,6 +4,9 @@ import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 
 import { TodoTaskCard } from "../components/todo-task-card";
 import {
+  aiDecomposeTodo,
+  aiRewriteTodo,
+  aiSuggestPriority,
   authStorageKey,
   createTodo,
   deleteTodo,
@@ -32,9 +35,31 @@ import {
 type FilterKey = "all" | "active" | "completed";
 type AuthMode = "login" | "register";
 
+type AIState = {
+  decomposeLoading: boolean;
+  rewriteLoading: boolean;
+  priorityLoading: boolean;
+  decompositionItems: string[];
+  rewriteReason: string;
+  priorityLevel: "" | "高" | "中" | "低";
+  priorityReason: string;
+  error: string;
+};
+
 function getErrorMessage(error: unknown, fallback: string) {
   return error instanceof Error ? error.message : fallback;
 }
+
+const initialAIState: AIState = {
+  decomposeLoading: false,
+  rewriteLoading: false,
+  priorityLoading: false,
+  decompositionItems: [],
+  rewriteReason: "",
+  priorityLevel: "",
+  priorityReason: "",
+  error: "",
+};
 
 export default function HomePage() {
   const [token, setToken] = useState<string | null>(null);
@@ -63,6 +88,7 @@ export default function HomePage() {
   const [activeFilter, setActiveFilter] = useState<FilterKey>("all");
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [aiState, setAIState] = useState<AIState>(initialAIState);
 
   const clearSession = useCallback(() => {
     window.localStorage.removeItem(authStorageKey);
@@ -78,6 +104,7 @@ export default function HomePage() {
     setEditingTitle("");
     setError("");
     setSuccessMessage("");
+    setAIState(initialAIState);
     setAuthLoading(false);
     setIsLoading(false);
   }, []);
@@ -155,6 +182,19 @@ export default function HomePage() {
     setToken(nextToken);
   }
 
+  function resetFeedback() {
+    setError("");
+    setSuccessMessage("");
+  }
+
+  function resetAIMessage() {
+    setAIState((current) => ({
+      ...current,
+      error: "",
+      rewriteReason: current.rewriteReason,
+    }));
+  }
+
   async function handleAuthSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -209,8 +249,7 @@ export default function HomePage() {
     }
 
     setProfileSaving(true);
-    setError("");
-    setSuccessMessage("");
+    resetFeedback();
 
     try {
       const user = await updateMyProfile(token, {
@@ -242,13 +281,13 @@ export default function HomePage() {
     }
 
     setIsSubmitting(true);
-    setError("");
-    setSuccessMessage("");
+    resetFeedback();
 
     try {
       const createdTodo = await createTodo(token, trimmedTitle);
       setTodos((currentTodos) => [createdTodo, ...currentTodos]);
       setTitle("");
+      setAIState(initialAIState);
       await reloadHistory(token);
       setSuccessMessage("添加成功。");
     } catch (submitError) {
@@ -264,8 +303,7 @@ export default function HomePage() {
     }
 
     setBusyTodoId(todo.id);
-    setError("");
-    setSuccessMessage("");
+    resetFeedback();
 
     try {
       const updatedTodo = await updateTodoStatus(token, todo.id, !todo.is_completed);
@@ -286,8 +324,7 @@ export default function HomePage() {
   function startEditing(todo: TodoItem) {
     setEditingTodoId(todo.id);
     setEditingTitle(getEditableTitle(todo.title));
-    setError("");
-    setSuccessMessage("");
+    resetFeedback();
   }
 
   function cancelEditing() {
@@ -307,8 +344,7 @@ export default function HomePage() {
     }
 
     setBusyTodoId(todoId);
-    setError("");
-    setSuccessMessage("");
+    resetFeedback();
 
     try {
       const updatedTodo = await updateTodoTitle(token, todoId, trimmedTitle);
@@ -333,8 +369,7 @@ export default function HomePage() {
     }
 
     setBusyTodoId(todoId);
-    setError("");
-    setSuccessMessage("");
+    resetFeedback();
 
     try {
       await deleteTodo(token, todoId);
@@ -348,6 +383,107 @@ export default function HomePage() {
       setError(getErrorMessage(deleteError, "删除任务失败，请稍后重试。"));
     } finally {
       setBusyTodoId(null);
+    }
+  }
+
+  async function handleAIDecompose() {
+    if (!token) {
+      return;
+    }
+
+    const trimmedTitle = title.trim();
+    if (!trimmedTitle) {
+      setAIState((current) => ({ ...current, error: "请先输入任务标题。"}));
+      return;
+    }
+
+    setAIState((current) => ({
+      ...current,
+      decomposeLoading: true,
+      error: "",
+    }));
+
+    try {
+      const result = await aiDecomposeTodo(token, trimmedTitle);
+      setAIState((current) => ({
+        ...current,
+        decompositionItems: result.items,
+      }));
+    } catch (aiError) {
+      setAIState((current) => ({
+        ...current,
+        error: getErrorMessage(aiError, "AI 拆解失败，请稍后重试。"),
+      }));
+    } finally {
+      setAIState((current) => ({ ...current, decomposeLoading: false }));
+    }
+  }
+
+  async function handleAIRewrite() {
+    if (!token) {
+      return;
+    }
+
+    const trimmedTitle = title.trim();
+    if (!trimmedTitle) {
+      setAIState((current) => ({ ...current, error: "请先输入任务标题。"}));
+      return;
+    }
+
+    setAIState((current) => ({
+      ...current,
+      rewriteLoading: true,
+      error: "",
+    }));
+
+    try {
+      const result = await aiRewriteTodo(token, trimmedTitle);
+      setTitle(result.title);
+      setAIState((current) => ({
+        ...current,
+        rewriteReason: result.reason,
+      }));
+    } catch (aiError) {
+      setAIState((current) => ({
+        ...current,
+        error: getErrorMessage(aiError, "AI 重写失败，请稍后重试。"),
+      }));
+    } finally {
+      setAIState((current) => ({ ...current, rewriteLoading: false }));
+    }
+  }
+
+  async function handleAIPriority() {
+    if (!token) {
+      return;
+    }
+
+    const trimmedTitle = title.trim();
+    if (!trimmedTitle) {
+      setAIState((current) => ({ ...current, error: "请先输入任务标题。"}));
+      return;
+    }
+
+    setAIState((current) => ({
+      ...current,
+      priorityLoading: true,
+      error: "",
+    }));
+
+    try {
+      const result = await aiSuggestPriority(token, trimmedTitle);
+      setAIState((current) => ({
+        ...current,
+        priorityLevel: result.priority,
+        priorityReason: result.reason,
+      }));
+    } catch (aiError) {
+      setAIState((current) => ({
+        ...current,
+        error: getErrorMessage(aiError, "AI 优先级建议失败，请稍后重试。"),
+      }));
+    } finally {
+      setAIState((current) => ({ ...current, priorityLoading: false }));
     }
   }
 
@@ -557,7 +693,7 @@ export default function HomePage() {
             <p className="greeting">{getGreeting()}</p>
             <h1>我的一天</h1>
             <p className="date-caption">
-              先把今天要做的事情收进来，再一件件完成。现在这套工作台已经支持登录鉴权、个人资料和任务历史记录。
+              先把今天要做的事情收进来，再一件件完成。当前版本已经支持登录鉴权、任务 CRUD、个人资料、历史记录，以及 AI 拆解、重写和优先级建议。
             </p>
           </div>
 
@@ -622,7 +758,10 @@ export default function HomePage() {
               id="todo-title"
               className="quick-entry-input"
               value={title}
-              onChange={(event) => setTitle(event.target.value)}
+              onChange={(event) => {
+                setTitle(event.target.value);
+                resetAIMessage();
+              }}
               placeholder="添加任务"
               disabled={isSubmitting}
             />
@@ -631,9 +770,71 @@ export default function HomePage() {
             </button>
           </form>
 
+          <div className="ai-toolbar">
+            <button
+              className="ai-tool-button"
+              type="button"
+              onClick={() => void handleAIDecompose()}
+              disabled={aiState.decomposeLoading || isSubmitting}
+            >
+              {aiState.decomposeLoading ? "拆解中..." : "AI 拆解任务"}
+            </button>
+            <button
+              className="ai-tool-button"
+              type="button"
+              onClick={() => void handleAIRewrite()}
+              disabled={aiState.rewriteLoading || isSubmitting}
+            >
+              {aiState.rewriteLoading ? "重写中..." : "AI 重写描述"}
+            </button>
+            <button
+              className="ai-tool-button"
+              type="button"
+              onClick={() => void handleAIPriority()}
+              disabled={aiState.priorityLoading || isSubmitting}
+            >
+              {aiState.priorityLoading ? "分析中..." : "AI 优先级建议"}
+            </button>
+          </div>
+
           <div className="feedback-row" aria-live="polite">
             {successMessage ? <p className="feedback success">{successMessage}</p> : null}
             {error ? <p className="feedback error">{error}</p> : null}
+            {aiState.error ? <p className="feedback error">{aiState.error}</p> : null}
+          </div>
+
+          <div className="ai-result-grid">
+            <section className="ai-result-card">
+              <p className="sidebar-card-title">AI 拆解结果</p>
+              {aiState.decompositionItems.length === 0 ? (
+                <p className="ai-result-empty">输入任务后，可让 AI 给出 3 到 5 条可执行子任务。</p>
+              ) : (
+                <ol className="ai-result-list">
+                  {aiState.decompositionItems.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ol>
+              )}
+            </section>
+
+            <section className="ai-result-card">
+              <p className="sidebar-card-title">AI 建议</p>
+              <div className="ai-insight-block">
+                <div className="ai-priority-row">
+                  <span>优先级</span>
+                  <strong className={`priority-badge priority-${aiState.priorityLevel || "empty"}`}>
+                    {aiState.priorityLevel || "未生成"}
+                  </strong>
+                </div>
+                <p className="ai-reason-text">
+                  {aiState.priorityReason || "这里会显示 AI 对任务紧急度与价值的判断理由。"}
+                </p>
+                <div className="ai-divider" />
+                <p className="ai-reason-text">
+                  {aiState.rewriteReason || "使用 AI 重写后，这里会说明它为什么这样调整标题。"}
+                </p>
+              </div>
+            </section>
           </div>
         </section>
 

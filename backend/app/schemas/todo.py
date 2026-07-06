@@ -26,3 +26,21 @@ class TodoListItem(BaseModel):
 
 class TodoListResponse(BaseModel):
     items: list[TodoListItem]
+
+
+class AITodoRequest(BaseModel):
+    title: str = Field(min_length=1, max_length=255)
+
+
+class AIDecomposeResponse(BaseModel):
+    items: list[str]
+
+
+class AIRewriteResponse(BaseModel):
+    title: str
+    reason: str
+
+
+class AIPriorityResponse(BaseModel):
+    priority: str
+    reason: str

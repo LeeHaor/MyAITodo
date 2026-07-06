@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.router import api_router
 from app.core.config import settings
-from app.db.base import create_tables
 
 
 app = FastAPI(
@@ -11,11 +10,6 @@ app = FastAPI(
     version="0.1.0",
     description="MyAITodo backend scaffold",
 )
-
-
-@app.on_event("startup")
-def on_startup() -> None:
-    create_tables()
 
 app.add_middleware(
     CORSMiddleware,
